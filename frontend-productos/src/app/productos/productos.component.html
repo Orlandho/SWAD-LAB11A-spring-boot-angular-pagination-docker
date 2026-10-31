@@ -1,0 +1,167 @@
+<div class="container my-5">
+  <!-- Encabezado del Laboratorio -->
+  <header class="pb-3 mb-4 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+      <h1 class="h3 fw-bold text-primary mb-1">
+        <i class="bi bi-box-seam me-2"></i>Catálogo de Productos Paginado
+      </h1>
+      <p class="text-muted small mb-0">
+        UPN - Soluciones Web y Aplicaciones Distribuidas | Semana 11 (Laboratorio 11A)
+      </p>
+    </div>
+    <div class="badge bg-primary text-uppercase px-3 py-2 fs-6 shadow-sm">
+      Spring Boot 3 + Angular 22 + Docker
+    </div>
+  </header>
+
+  <!-- Panel de Control: Filtros y Selector de Tamaño -->
+  <div class="card shadow-sm mb-4 border-0">
+    <div class="card-body bg-white rounded-3 p-4">
+      <div class="row g-3 align-items-center justify-content-between">
+        <!-- Reto Adicional: Búsqueda por Nombre -->
+        <div class="col-md-7 col-12">
+          <label class="form-label fw-semibold small text-secondary mb-1">
+            Buscar producto por nombre (Reto Adicional):
+          </label>
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Ej. Laptop, Mouse, Teclado..."
+              [(ngModel)]="terminoBusqueda"
+              (keyup.enter)="buscar()"
+            />
+            <button class="btn btn-primary" type="button" (click)="buscar()">
+              Buscar
+            </button>
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              (click)="limpiarBusqueda()"
+              [disabled]="!terminoBusqueda"
+            >
+              Limpiar
+            </button>
+          </div>
+        </div>
+
+        <!-- Actividad Guiada: Selector de Tamaño de Página (5, 10, 20) -->
+        <div class="col-md-4 col-12">
+          <label class="form-label fw-semibold small text-secondary mb-1">
+            Registros por página (Actividad Guiada):
+          </label>
+          <div class="d-flex align-items-center gap-2">
+            <select
+              class="form-select"
+              [(ngModel)]="tamanio"
+              (change)="cambiarTamanio()"
+            >
+              <option *ngFor="let opc of opcionesTamanio" [value]="opc">
+                {{ opc }} productos por página
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alerta de Error si el Backend no Responde -->
+  <div *ngIf="errorMensaje" class="alert alert-danger shadow-sm d-flex align-items-center gap-2" role="alert">
+    <span>{{ errorMensaje }}</span>
+  </div>
+
+  <!-- Contenedor Principal de la Tabla de Productos -->
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+      <h2 class="h5 mb-0 fw-semibold">Listado de Productos</h2>
+      <span class="badge bg-light text-dark fw-bold px-3 py-2">
+        Total en BD: {{ totalElementos }}
+      </span>
+    </div>
+
+    <div class="card-body p-0">
+      <!-- Indicador de Carga -->
+      <div *ngIf="cargando" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-2 text-muted small">Cargando página de productos desde Spring Boot...</p>
+      </div>
+
+      <!-- Tabla Responsiva -->
+      <div *ngIf="!cargando && productos.length > 0" class="table-responsive">
+        <table class="table table-hover table-striped align-middle mb-0">
+          <thead class="table-secondary">
+            <tr>
+              <th scope="col" style="width: 80px;" class="text-center">ID</th>
+              <th scope="col">Nombre del Producto</th>
+              <th scope="col" style="width: 140px;" class="text-end">Precio (PEN)</th>
+              <th scope="col" style="width: 120px;" class="text-center">Stock</th>
+              <th scope="col" style="width: 150px;" class="text-center">Estado Stock</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of productos">
+              <td class="text-center fw-bold text-muted">{{ p.id }}</td>
+              <td class="fw-semibold">{{ p.nombre }}</td>
+              <td class="text-end fw-bold text-primary">
+                {{ p.precio | currency:'PEN':'symbol':'1.2-2' }}
+              </td>
+              <td class="text-center">
+                <span class="badge rounded-pill bg-light text-dark border">
+                  {{ p.stock }} unids.
+                </span>
+              </td>
+              <td class="text-center">
+                <span
+                  class="badge px-3 py-2"
+                  [ngClass]="{
+                    'bg-success': p.estadoStock === 'OK',
+                    'bg-danger': p.estadoStock === 'INSUFICIENTE'
+                  }"
+                >
+                  {{ p.estadoStock }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Estado Vacío -->
+      <div *ngIf="!cargando && productos.length === 0" class="text-center py-5 text-muted">
+        <p class="fs-5 mb-1">No se encontraron productos en esta página o filtro.</p>
+        <button class="btn btn-sm btn-outline-primary mt-2" (click)="limpiarBusqueda()">
+          Restablecer Filtros
+        </button>
+      </div>
+    </div>
+
+    <!-- Paginador Footer -->
+    <div class="card-footer bg-white border-top py-3">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <button
+          class="btn btn-outline-primary px-4 fw-semibold"
+          (click)="anterior()"
+          [disabled]="primera || cargando"
+        >
+          &laquo; Anterior
+        </button>
+
+        <span class="fw-semibold text-secondary">
+          Página {{ totalPaginas === 0 ? 0 : pagina + 1 }} de {{ totalPaginas }}
+          <span class="text-muted fw-normal">({{ totalElementos }} registros)</span>
+        </span>
+
+        <button
+          class="btn btn-outline-primary px-4 fw-semibold"
+          (click)="siguiente()"
+          [disabled]="ultima || cargando"
+        >
+          Siguiente &raquo;
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

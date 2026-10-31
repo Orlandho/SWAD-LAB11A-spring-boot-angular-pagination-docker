@@ -1,0 +1,22 @@
+.table th {
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+.badge {
+  font-size: 0.85rem;
+  letter-spacing: 0.02rem;
+}
+
+.card {
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.input-group .btn {
+  z-index: 0;
+}

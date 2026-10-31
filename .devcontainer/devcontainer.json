@@ -1,0 +1,32 @@
+{
+  "name": "SWAD - Semana 11 (Laboratorio 11A)",
+  "image": "mcr.microsoft.com/devcontainers/universal:latest",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "forwardPorts": [8080, 4200, 3306],
+  "portsAttributes": {
+    "4200": {
+      "label": "Frontend Angular",
+      "onAutoForward": "openBrowser"
+    },
+    "8080": {
+      "label": "Backend Spring Boot REST API",
+      "onAutoForward": "silent"
+    },
+    "3306": {
+      "label": "MySQL 8.4 Database Container",
+      "onAutoForward": "silent"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vmware.vscode-spring-boot",
+        "angular.ng-template",
+        "hediet.vscode-drawio"
+      ]
+    }
+  }
+}

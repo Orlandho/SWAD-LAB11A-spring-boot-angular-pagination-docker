@@ -1,0 +1,114 @@
+<mxfile host="app.diagrams.net" modified="2026-10-31T21:30:00.000Z" agent="Mozilla/5.0" version="24.7.17" type="device">
+  <diagram id="swad-lab11a-architecture" name="Arquitectura Paginacion Spring Boot Angular Docker">
+    <mxGraphModel dx="1422" dy="798" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Contenedor GitHub Codespaces -->
+        <mxCell id="codespaces-boundary" value="Entorno Cloud: GitHub Codespaces (Linux DevContainer / Universal Image)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#495057;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#212529;startSize=30;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="1090" height="740" as="geometry" />
+        </mxCell>
+
+        <!-- Capa Frontend Angular -->
+        <mxCell id="frontend-lane" value="Frontend: Angular 22 SPA (Puerto 4200)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1976d2;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#0d47a1;startSize=30;" vertex="1" parent="codespaces-boundary">
+          <mxGeometry x="30" y="50" width="310" height="660" as="geometry" />
+        </mxCell>
+
+        <mxCell id="fe-component" value="&lt;b&gt;ProductosComponent&lt;/b&gt;&lt;hr/&gt;• Tabla reactiva de productos&lt;br/&gt;• Navegación Anterior / Siguiente&lt;br/&gt;• Indicador: Página X de Y&lt;br/&gt;• Selector tamaño: 5, 10, 20&lt;br/&gt;• Buscador por nombre con filtro" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1976d2;shadow=1;align=left;spacingLeft=10;" vertex="1" parent="frontend-lane">
+          <mxGeometry x="20" y="50" width="270" height="130" as="geometry" />
+        </mxCell>
+
+        <mxCell id="fe-models" value="&lt;b&gt;Modelos TypeScript&lt;/b&gt;&lt;hr/&gt;• &lt;i&gt;Producto:&lt;/i&gt; id, nombre, precio, stock, estadoStock&lt;br/&gt;• &lt;i&gt;Pagina&amp;lt;T&amp;gt;:&lt;/i&gt; content, totalElements, totalPages, number, size, first, last" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1976d2;shadow=1;align=left;spacingLeft=10;" vertex="1" parent="frontend-lane">
+          <mxGeometry x="20" y="210" width="270" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="fe-service" value="&lt;b&gt;ProductoService&lt;/b&gt;&lt;hr/&gt;• HttpClient inyectado&lt;br/&gt;• &lt;code&gt;listarPaginado(page, size, sort)&lt;/code&gt;&lt;br/&gt;• &lt;code&gt;buscarPorNombre(nombre, page, size)&lt;/code&gt;&lt;br/&gt;• Parámetros HTTP: HttpParams" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1976d2;shadow=1;align=left;spacingLeft=10;" vertex="1" parent="frontend-lane">
+          <mxGeometry x="20" y="350" width="270" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="fe-proxy" value="&lt;b&gt;Proxy Reverso Angular&lt;/b&gt;&lt;br/&gt;(&lt;code&gt;proxy.conf.json&lt;/code&gt;)&lt;hr/&gt;&lt;code&gt;/api/**&lt;/code&gt; &amp;rarr; &lt;code&gt;http://127.0.0.1:8080&lt;/code&gt;&lt;br/&gt;Evita CORS y aisla la IP del Codespace" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#fbc02d;shadow=1;align=center;" vertex="1" parent="frontend-lane">
+          <mxGeometry x="20" y="500" width="270" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="fe-flow1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976d2;strokeWidth=2;" edge="1" source="fe-component" target="fe-service" parent="frontend-lane">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="fe-flow2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976d2;strokeWidth=2;" edge="1" source="fe-service" target="fe-proxy" parent="frontend-lane">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Capa Backend Spring Boot -->
+        <mxCell id="backend-lane" value="Backend: Spring Boot 3 REST API (Puerto 8080)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#388e3c;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#1b5e20;startSize=30;" vertex="1" parent="codespaces-boundary">
+          <mxGeometry x="380" y="50" width="340" height="660" as="geometry" />
+        </mxCell>
+
+        <mxCell id="be-controller" value="&lt;b&gt;ProductoController&lt;/b&gt; (@RestController)&lt;hr/&gt;• &lt;code&gt;GET /api/productos/pagina&lt;/code&gt;&lt;br/&gt;• &lt;code&gt;GET /api/productos/pagina/buscar&lt;/code&gt;&lt;br/&gt;• Inyección de &lt;b&gt;Pageable&lt;/b&gt;&lt;br/&gt;• &lt;code&gt;@PageableDefault(size=5, sort=&quot;id&quot;)&lt;/code&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#388e3c;shadow=1;align=left;spacingLeft=10;" vertex="1" parent="backend-lane">
+          <mxGeometry x="20" y="50" width="300" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="be-service" value="&lt;b&gt;ProductoService&lt;/b&gt; (@Service)&lt;hr/&gt;• &lt;code&gt;listarPaginado(Pageable)&lt;/code&gt;&lt;br/&gt;• &lt;code&gt;buscarPorNombre(String, Pageable)&lt;/code&gt;&lt;br/&gt;• Validación defensiva de inputs&lt;br/&gt;• Delegación estricta al Repository" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#388e3c;shadow=1;align=left;spacingLeft=10;" vertex="1" parent="backend-lane">
+          <mxGeometry x="20" y="210" width="300" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="be-repository" value="&lt;b&gt;ProductoRepository&lt;/b&gt; (JpaRepository)&lt;hr/&gt;• &lt;code&gt;findAll(Pageable)&lt;/code&gt;&lt;br/&gt;• &lt;code&gt;findByNombreContainingIgnoreCase(...)&lt;/code&gt;&lt;br/&gt;• Generación automática de &lt;b&gt;LIMIT / OFFSET&lt;/b&gt;&lt;br/&gt;• Conteo eficiente &lt;b&gt;COUNT(*)&lt;/b&gt; para metadatos" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#388e3c;shadow=1;align=left;spacingLeft=10;" vertex="1" parent="backend-lane">
+          <mxGeometry x="20" y="350" width="300" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="be-model" value="&lt;b&gt;Entidad JPA Producto&lt;/b&gt; (@Entity)&lt;hr/&gt;• Columnas: &lt;i&gt;id, nombre, precio, stock&lt;/i&gt;&lt;br/&gt;• Lógica calculada: &lt;code&gt;@Transient getEstadoStock()&lt;/code&gt;&lt;br/&gt;  (stock &amp;lt; 5 ? &quot;INSUFICIENTE&quot; : &quot;OK&quot;)&lt;br/&gt;• Serializado en JSON automáticamente" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#388e3c;shadow=1;align=left;spacingLeft=10;" vertex="1" parent="backend-lane">
+          <mxGeometry x="20" y="500" width="300" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="be-flow1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#388e3c;strokeWidth=2;" edge="1" source="be-controller" target="be-service" parent="backend-lane">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="be-flow2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#388e3c;strokeWidth=2;" edge="1" source="be-service" target="be-repository" parent="backend-lane">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Capa Base de Datos Docker -->
+        <mxCell id="db-lane" value="Persistencia: Contenedor Docker MySQL 8.4 (Puerto 3306)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#e65100;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#bf360c;startSize=30;" vertex="1" parent="codespaces-boundary">
+          <mxGeometry x="760" y="50" width="300" height="660" as="geometry" />
+        </mxCell>
+
+        <mxCell id="db-engine" value="&lt;b&gt;Contenedor Docker: mysql-lab11&lt;/b&gt;&lt;hr/&gt;• Imagen oficial &lt;code&gt;mysql:8.4&lt;/code&gt;&lt;br/&gt;• Base de datos: &lt;b&gt;bd_laboratorio11&lt;/b&gt;&lt;br/&gt;• Root Password: &lt;code&gt;Root123*&lt;/code&gt;&lt;br/&gt;• Red interna: localhost:3306" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffffff;strokeColor=#e65100;shadow=1;" vertex="1" parent="db-lane">
+          <mxGeometry x="30" y="60" width="240" height="160" as="geometry" />
+        </mxCell>
+
+        <mxCell id="db-table" value="&lt;b&gt;Tabla producto&lt;/b&gt;&lt;hr/&gt;• &lt;code&gt;id&lt;/code&gt; BIGINT AUTO_INCREMENT PK&lt;br/&gt;• &lt;code&gt;nombre&lt;/code&gt; VARCHAR(100) NOT NULL&lt;br/&gt;• &lt;code&gt;precio&lt;/code&gt; DOUBLE NOT NULL&lt;br/&gt;• &lt;code&gt;stock&lt;/code&gt; INT NOT NULL&lt;br/&gt;&lt;hr/&gt;&lt;i&gt;Poblado con 15 registros iniciales&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#e65100;shadow=1;align=left;spacingLeft=10;" vertex="1" parent="db-lane">
+          <mxGeometry x="30" y="260" width="240" height="160" as="geometry" />
+        </mxCell>
+
+        <mxCell id="db-volume" value="&lt;b&gt;Volumen Docker Persistente&lt;/b&gt;&lt;hr/&gt;&lt;code&gt;mysql_lab11_data&lt;/code&gt;&lt;br/&gt;Garantiza que la información persista aun si el contenedor se destruye o reinicia" style="shape=folder;fontStyle=1;tabWidth=110;tabHeight=30;tabPosition=left;html=1;boundedLbl=1;whiteSpace=wrap;fillColor=#ffe0b2;strokeColor=#e65100;align=center;" vertex="1" parent="db-lane">
+          <mxGeometry x="30" y="470" width="240" height="150" as="geometry" />
+        </mxCell>
+
+        <mxCell id="db-flow1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#e65100;strokeWidth=2;" edge="1" source="db-engine" target="db-table" parent="db-lane">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="db-flow2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#e65100;strokeWidth=2;" edge="1" source="db-table" target="db-volume" parent="db-lane">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Conexiones Inter-capas -->
+        <mxCell id="inter-fe-be" value="Proxy reenvía peticiones REST&lt;br/&gt;(&lt;code&gt;page=0&amp;amp;size=5&amp;amp;sort=id,asc&lt;/code&gt;)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#1976d2;strokeWidth=3;fontStyle=1;" edge="1" source="fe-proxy" target="be-controller" parent="codespaces-boundary">
+          <mxGeometry relative="1" as="geometry">
+            <Array points="350" y="610" />
+            <Array points="350" y="160" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="inter-be-db" value="JDBC / Hibernate SQL&lt;br/&gt;SELECT ... LIMIT ? OFFSET ?" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#388e3c;strokeWidth=3;fontStyle=1;" edge="1" source="be-repository" target="db-table" parent="codespaces-boundary">
+          <mxGeometry relative="1" as="geometry">
+            <Array points="740" y="460" />
+            <Array points="740" y="390" />
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
