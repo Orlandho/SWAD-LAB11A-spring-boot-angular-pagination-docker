@@ -68,7 +68,7 @@ export class ProductosComponent implements OnInit {
   }
 
   siguiente(): void {
-    if (!this.ultima && (this.totalPaginas === 0 || this.pagina < this.totalPaginas - 1)) {
+    if (!this.ultima && this.totalPaginas > 0 && this.pagina < this.totalPaginas - 1) {
       this.pagina++;
       this.cargarProductos();
     }

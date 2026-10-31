@@ -98,6 +98,17 @@ describe('ProductosComponent', () => {
     expect(component.pagina).toBe(1);
   });
 
+  it('siguiente() no debe avanzar si totalPaginas es 0', () => {
+    component.pagina = 0;
+    component.ultima = false;
+    component.totalPaginas = 0;
+    mockProductoService.listarPaginado.mockClear();
+
+    component.siguiente();
+    expect(component.pagina).toBe(0);
+    expect(mockProductoService.listarPaginado).not.toHaveBeenCalled();
+  });
+
   it('debe manejar errores del backend mostrando mensaje al usuario', () => {
     mockProductoService.listarPaginado.mockReturnValue(throwError(() => new Error('Error de red')));
     component.cargarProductos();

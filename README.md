@@ -28,38 +28,31 @@ Este proyecto implementa una solución integral al problema de escalabilidad del
 
 ---
 
-## 2. Arquitectura de la Solución y Diagramas Draw.io
+## 2. Arquitectura de la Solución y Diagrama Draw.io
 
-La solución respeta los principios de Clean Architecture y separación de responsabilidades:
+La solución respeta los principios de Clean Architecture y separación de responsabilidades distribuidas en tres capas principales desacopladas:
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                       GITHUB CODESPACES / DEVCONTAINER                      │
-│                                                                             │
-│  ┌──────────────────────┐    HTTP (Proxy)     ┌─────────────────────────┐  │
-│  │   Angular 22 SPA     │ ──────────────────> │   Spring Boot 3 API     │  │
-│  │   (Puerto 4200)      │                     │   (Puerto 8080)         │  │
-│  │                      │                     │                         │  │
-│  │ • ProductosComponent │                     │ • ProductoController    │  │
-│  │ • ProductoService    │                     │ • ProductoService       │  │
-│  │ • Pagina<Producto>   │                     │ • ProductoRepository    │  │
-│  └──────────────────────┘                     └────────────┬────────────┘  │
-│                                                            │ JDBC           │
-│                                                            │ SQL LIMIT/?    │
-│                                                            v                │
-│                                               ┌─────────────────────────┐  │
-│                                               │  Docker MySQL 8.4       │  │
-│                                               │  (Puerto 3306)          │  │
-│                                               │                         │  │
-│                                               │ • bd_laboratorio11      │  │
-│                                               │ • mysql_lab11_data (Vol)│  │
-│                                               └─────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
+1. **Capa Cliente (Frontend Angular 22 SPA - Puerto 4200):**
+   - Interfaz web responsiva con componentes Standalone (`ProductosComponent`).
+   - Gestión reactiva del estado de paginación (`first`, `last`, `number`, `totalPages`, `totalElements`).
+   - Selector dinámico de registros por página (5, 10, 20) y búsqueda por nombre en tiempo real.
+   - Enrutamiento interno a través de proxy reverso (`proxy.conf.json`) para delegar el consumo a `/api/productos`.
 
-### Diagrama Fuente Draw.io
-El diagrama arquitectónico formal, detallado con especificación de componentes, flujos de red y estructuras de datos, se encuentra disponible en formato `.drawio` editable:
-- **Ruta del Diagrama:** [`diagramas/arquitectura_paginacion.drawio`](diagramas/arquitectura_paginacion.drawio)
+2. **Capa Servidor (Backend Spring Boot 3 REST API - Puerto 8080):**
+   - Controlador REST (`ProductoController`) que inyecta parámetros `Pageable` (`page`, `size`, `sort`) con valores por defecto.
+   - Capa de servicio transaccional (`ProductoService`) desacoplada con validaciones defensivas.
+   - Repositorio Spring Data JPA (`ProductoRepository`) que genera dinámicamente consultas SQL optimizadas con `LIMIT` y `OFFSET`.
+   - Entidad JPA (`Producto`) con cálculo de lógica de negocio transitoria `@Transient` para evaluación de stock crítico.
+   - Manejador global de excepciones (`GlobalExceptionHandler`) para respuestas ProblemDetail estructuradas.
+
+3. **Capa de Persistencia (Docker MySQL 8.4 LTS - Puerto 3306):**
+   - Contenedor aislado `mysql-lab11` orquestado mediante `docker-compose.yml`.
+   - Base de datos `bd_laboratorio11` poblada con el script de 15 registros oficiales (`docker/init.sql`).
+   - Persistencia asegurada en volumen independiente `mysql_lab11_data`.
+
+### Diagrama Arquitectónico Oficial Draw.io
+El diseño y flujo arquitectónico se encuentra modelado en el archivo fuente oficial Draw.io (conforme a los estándares del proyecto):
+- **Archivo fuente Draw.io:** [`diagramas/arquitectura_paginacion.drawio`](diagramas/arquitectura_paginacion.drawio) *(Editable y visualizable directamente en VS Code con la extensión Draw.io Integration o en app.diagrams.net)*.
 
 ---
 
@@ -265,13 +258,13 @@ El proyecto cuenta con suites de pruebas unitarias y de integración en ambas ca
 ### Backend Test Suite (Spring Boot + JUnit 5 + MockMvc)
 ```
 [INFO] Running com.ejemplo.laboratorio11.BackendProductosApplicationTests
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.583 s
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 [INFO] Running com.ejemplo.laboratorio11.ProductoControllerTest
-[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.812 s
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
 [INFO] Running com.ejemplo.laboratorio11.ProductoRepositoryTest
-[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.033 s
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
 [INFO] Results:
-[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 12, Failures: 0, Errors: 0, Skipped: 0
 [INFO] BUILD SUCCESS
 ```
 
@@ -282,16 +275,18 @@ Casos cubiertos:
 - Ordenamiento por precio descendente (`sort=precio,desc`).
 - Búsqueda por coincidencia de nombre insensible a mayúsculas.
 - Búsqueda con término vacío retornando el catálogo paginado.
+- Tolerancia y sanitización de índice negativo de página (`page=-1` -> fallback `number=0`).
+- Tolerancia de tamaño cero (`size=0` -> fallback tamaño por defecto `size=5`).
+- Tolerancia a parámetro de página no numérico (`page=invalido` -> fallback `number=0`).
 - Cálculo de la propiedad `@Transient` `getEstadoStock()` (`< 5` -> "INSUFICIENTE", `>= 5` -> "OK").
 
 ### Frontend Test Suite (Angular 22 + Vitest)
 ```
- ✓  frontend-productos  src/app/services/producto.service.spec.ts (3 tests) 48ms
- ✓  frontend-productos  src/app/productos/productos.component.spec.ts (7 tests) 253ms
+ ✓  frontend-productos  src/app/services/producto.service.spec.ts (3 tests)
+ ✓  frontend-productos  src/app/productos/productos.component.spec.ts (8 tests)
 
  Test Files  2 passed (2)
-      Tests  10 passed (10)
-   Duration  3.12s
+      Tests  11 passed (11)
 ```
 
 Casos cubiertos:
@@ -300,6 +295,7 @@ Casos cubiertos:
 - Renderizado inicial y asignación de propiedades de `Pagina<Producto>`.
 - Selector de tamaño de página reiniciando el cursor a `page = 0`.
 - Búsqueda por término y restablecimiento con `limpiarBusqueda()`.
+- Guarda en el método `siguiente()` cuando `totalPaginas === 0` (catálogo vacío o sin coincidencias).
 - Guardas en los métodos `anterior()` y `siguiente()` para no desbordar índices.
 - Manejo elegante de fallas de conexión o errores HTTP en la interfaz.
 

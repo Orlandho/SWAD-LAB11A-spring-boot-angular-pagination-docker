@@ -54,9 +54,9 @@
             <select
               class="form-select"
               [(ngModel)]="tamanio"
-              (change)="cambiarTamanio()"
+              (ngModelChange)="cambiarTamanio()"
             >
-              <option *ngFor="let opc of opcionesTamanio" [value]="opc">
+              <option *ngFor="let opc of opcionesTamanio" [ngValue]="opc">
                 {{ opc }} productos por página
               </option>
             </select>
@@ -144,7 +144,7 @@
         <button
           class="btn btn-outline-primary px-4 fw-semibold"
           (click)="anterior()"
-          [disabled]="primera || cargando"
+          [disabled]="primera || cargando || pagina === 0"
         >
           &laquo; Anterior
         </button>
@@ -157,7 +157,7 @@
         <button
           class="btn btn-outline-primary px-4 fw-semibold"
           (click)="siguiente()"
-          [disabled]="ultima || cargando"
+          [disabled]="ultima || cargando || totalPaginas === 0 || pagina >= totalPaginas - 1"
         >
           Siguiente &raquo;
         </button>

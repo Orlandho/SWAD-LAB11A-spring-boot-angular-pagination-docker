@@ -112,4 +112,39 @@ class ProductoControllerTest {
                 .andExpect(jsonPath("$.content", hasSize(5)))
                 .andExpect(jsonPath("$.totalElements", is(7)));
     }
+
+    @Test
+    @DisplayName("GET /api/productos/pagina?page=-1 aplica tolerancia de Spring Data y retorna primera pagina (number=0)")
+    void testGetPaginaIndiceNegativoAplicaFallback() throws Exception {
+        mockMvc.perform(get("/api/productos/pagina")
+                        .param("page", "-1")
+                        .param("size", "5")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.number", is(0)))
+                .andExpect(jsonPath("$.content", hasSize(5)));
+    }
+
+    @Test
+    @DisplayName("GET /api/productos/pagina?size=0 aplica tolerancia de Spring Data y retorna tamanio por defecto")
+    void testGetPaginaTamanioCeroAplicaFallback() throws Exception {
+        mockMvc.perform(get("/api/productos/pagina")
+                        .param("page", "0")
+                        .param("size", "0")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size", is(5)))
+                .andExpect(jsonPath("$.content", hasSize(5)));
+    }
+
+    @Test
+    @DisplayName("GET /api/productos/pagina?page=invalido aplica tolerancia y retorna primera pagina")
+    void testGetPaginaTipoInvalidoAplicaFallback() throws Exception {
+        mockMvc.perform(get("/api/productos/pagina")
+                        .param("page", "invalido")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.number", is(0)));
+    }
 }
+

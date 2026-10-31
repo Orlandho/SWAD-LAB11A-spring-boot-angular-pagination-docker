@@ -2,7 +2,7 @@
   "name": "SWAD - Semana 11 (Laboratorio 11A)",
   "image": "mcr.microsoft.com/devcontainers/universal:latest",
   "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:4": {}
   },
   "forwardPorts": [8080, 4200, 3306],
   "portsAttributes": {
