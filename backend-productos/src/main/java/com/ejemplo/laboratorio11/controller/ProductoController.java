@@ -36,15 +36,4 @@ public class ProductoController {
             Pageable pageable) {
         return productoService.buscarPorNombre(nombre, pageable);
     }
-    @GetMapping("/pagina/avanzada")
-    public Page<Producto> buscarAvanzado(
-            @RequestParam(defaultValue = "") String nombre,
-            @RequestParam(defaultValue = "0") Double precioMin,
-            @RequestParam(defaultValue = "999999") Double precioMax,
-            @RequestParam(defaultValue = "0") Integer stockMin,
-            @PageableDefault(size = 5, sort = "precio")
-            Pageable pageable) {
-        return productoService.buscarAvanzado(
-                nombre, precioMin, precioMax, stockMin, pageable);
-    }
 }

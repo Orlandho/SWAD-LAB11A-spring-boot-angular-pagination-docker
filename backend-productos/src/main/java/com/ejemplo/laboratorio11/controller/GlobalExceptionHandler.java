@@ -36,16 +36,4 @@ public class GlobalExceptionHandler {
         problem.setProperty("timestamp", Instant.now());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
-    // Error controlado para observar el rollback desde Swagger / curl (semana 05).
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ProblemDetail> handleRuntimeException(RuntimeException ex) {
-        boolean pruebaRollback = ex.getMessage() != null &&
-                ex.getMessage().startsWith("Error simulado:");
-        String mensaje = pruebaRollback ? ex.getMessage() : "Error interno del servidor";
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
-                HttpStatus.INTERNAL_SERVER_ERROR, mensaje);
-        problem.setTitle("No se pudo completar la operacion");
-        problem.setProperty("timestamp", Instant.now());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem);
-    }
 }

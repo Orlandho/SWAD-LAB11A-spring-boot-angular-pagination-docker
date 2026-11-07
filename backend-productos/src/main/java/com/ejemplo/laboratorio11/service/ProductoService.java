@@ -30,17 +30,4 @@ public class ProductoService {
         return productoRepository
                 .findByNombreContainingIgnoreCase(nombre.trim(), pageable);
     }
-    public Page<Producto> buscarAvanzado(
-            String nombre,
-            Double precioMin,
-            Double precioMax,
-            Integer stockMin,
-            Pageable pageable) {
-        if (precioMin > precioMax || precioMin < 0 || stockMin < 0) {
-            throw new IllegalArgumentException("Los filtros de busqueda son invalidos");
-        }
-        return productoRepository.buscarAvanzado(
-                nombre == null ? "" : nombre.trim(),
-                precioMin, precioMax, stockMin, pageable);
-    }
 }
