@@ -5,13 +5,28 @@
 | Evidencia | Resultado esperado | Observación |
 | --- | --- | --- |
 | `java -version` y `./mvnw -v` | JDK 17 o superior; Maven Wrapper responde | Adjuntar salida real |
-| `./mvnw clean test` | 3 pruebas correctas | Adjuntar salida real del entorno |
+| `./mvnw clean test` | 3 pruebas correctas | **Validado en GitHub Actions; ver registro abajo** |
 | POST `/api/atenciones`, `simularError=false` | HTTP 201; 1 atención y 1 historial | Captura de API y listados |
 | POST `/api/atenciones`, `simularError=true` | HTTP 500; conteos antes/después iguales | Captura de API y listados |
 | GET `/api/atenciones/buscar` | Página de atenciones filtrada con JPQL | Captura de JSON y parámetros |
 
-**Estado de verificación:** preparar y ejecutar estos pasos en Codespaces o VS Code.
-No se atribuyen resultados ni capturas a una ejecución inexistente.
+**Validación automatizada real (GitHub Actions, 7 de noviembre de 2026):**
+
+- Ejecución: https://github.com/Orlandho/SWAD-LAB11A-spring-boot-angular-pagination-docker/actions/runs/42407508236
+- Entorno de ejecución: Ubuntu, Java 17, Maven Wrapper, H2 en memoria.
+- Comando: `./mvnw -B clean test`.
+- Registro de ejecución:
+
+```text
+[INFO] Running pe.upn.sist1402a.semana12.AtencionServiceIntegrationTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+```
+
+**Alcance de la evidencia:** los tres tests verificaron registro exitoso en dos tablas,
+rollback ante una excepción checked y JPQL parametrizado con paginación.
+Las peticiones HTTP manuales y capturas de pantalla siguen pendientes de realizarse
+con el servidor abierto en el entorno del estudiante. No se simulan capturas.
 
 ## II. Análisis de resultados
 
